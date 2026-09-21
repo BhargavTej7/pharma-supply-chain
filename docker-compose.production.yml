@@ -1,0 +1,66 @@
+services:
+  eureka-server:
+    build: ./eureka-server
+    restart: unless-stopped
+    environment:
+      EUREKA_HOST: ${EUREKA_HOST:?EUREKA_HOST must be set}
+    networks: [pharma]
+  user-service:
+    build: ./user-service
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:?DATABASE_USERNAME must be set}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD must be set}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
+      EUREKA_URL: ${EUREKA_URL:?EUREKA_URL must be set}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:?BOOTSTRAP_ADMIN_EMAIL must be set}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:?BOOTSTRAP_ADMIN_PASSWORD must be set}
+    depends_on: [eureka-server]
+    networks: [pharma]
+  medicine-service:
+    build: ./medicine-service/medicine-service
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:?DATABASE_USERNAME must be set}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD must be set}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?INTERNAL_SERVICE_TOKEN must be set}
+      EUREKA_URL: ${EUREKA_URL:?EUREKA_URL must be set}
+    depends_on: [eureka-server]
+    networks: [pharma]
+  order-service:
+    build: ./order-service
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:?DATABASE_USERNAME must be set}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD must be set}
+      MEDICINE_SERVICE_URL: ${MEDICINE_SERVICE_URL:?MEDICINE_SERVICE_URL must be set}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?INTERNAL_SERVICE_TOKEN must be set}
+      EUREKA_URL: ${EUREKA_URL:?EUREKA_URL must be set}
+    depends_on: [eureka-server, medicine-service]
+    networks: [pharma]
+  api-gateway:
+    build: ./api-gateway
+    restart: unless-stopped
+    environment:
+      EUREKA_URL: ${EUREKA_URL:?EUREKA_URL must be set}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:?FRONTEND_ORIGIN must be set}
+    depends_on: [eureka-server, user-service, medicine-service, order-service]
+    ports: ["8080:8080"]
+    networks: [pharma]
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        API_BASE_URL: ${FRONTEND_API_BASE_URL:?FRONTEND_API_BASE_URL must be set}
+    restart: unless-stopped
+    depends_on: [api-gateway]
+    ports: ["80:80"]
+    networks: [pharma]
+networks:
+  pharma:
+    driver: bridge

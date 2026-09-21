@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: pharma_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD must be set}
+    ports: ["5432:5432"]
+    volumes: [pharma-data:/var/lib/postgresql/data]
+  eureka-server:
+    build: ./eureka-server
+    ports: ["8761:8761"]
+  user-service:
+    build: ./user-service
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/pharma_db
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD must be set}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
+      EUREKA_URL: http://eureka-server:8761/eureka
+    depends_on: [postgres, eureka-server]
+    ports: ["8081:8081"]
+  medicine-service:
+    build: ./medicine-service/medicine-service
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/pharma_db
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD must be set}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?INTERNAL_SERVICE_TOKEN must be set}
+      EUREKA_URL: http://eureka-server:8761/eureka
+    depends_on: [postgres, eureka-server]
+    ports: ["8082:8082"]
+  order-service:
+    build: ./order-service
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/pharma_db
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD must be set}
+      MEDICINE_SERVICE_URL: http://medicine-service:8082
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?INTERNAL_SERVICE_TOKEN must be set}
+      EUREKA_URL: http://eureka-server:8761/eureka
+    depends_on: [postgres, eureka-server, medicine-service]
+    ports: ["8083:8083"]
+  api-gateway:
+    build: ./api-gateway
+    depends_on: [eureka-server, user-service, medicine-service, order-service]
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:3000}
+    ports: ["8080:8080"]
+  frontend:
+    build: ./frontend
+    depends_on: [api-gateway]
+    ports: ["3000:80"]
+volumes:
+  pharma-data:

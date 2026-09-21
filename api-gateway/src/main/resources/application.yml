@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    gateway:
+      server:
+        webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: ${FRONTEND_ORIGIN:http://localhost:3000}
+                allowedMethods: GET,POST,PUT,DELETE,OPTIONS
+                allowedHeaders: '*'
+                allowCredentials: true
+          routes:
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/users/**,/test
+            - id: medicine-service
+              uri: lb://medicine-service
+              predicates:
+                - Path=/medicines/**
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/orders/**
+server:
+  port: 8080
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}

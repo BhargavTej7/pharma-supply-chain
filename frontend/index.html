@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Apothecary Express pharmaceutical catalog and secure order fulfillment.">
+  <title>Apothecary Express</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#catalog" aria-label="Apothecary Express home"><span class="brand-mark">AE</span><span>APOTHECARY <b>EXPRESS</b></span></a>
+    <nav class="main-nav" aria-label="Primary navigation">
+      <button class="nav-link" data-view="catalog">Catalog</button>
+      <button class="nav-link" data-view="dashboard" data-auth-only hidden>Dashboard</button>
+      <button class="nav-link" data-view="admin" data-admin-only hidden>Admin</button>
+      <button class="button button-quiet" id="auth-open">Sign in</button>
+      <button class="button button-accent" id="logout" data-auth-only hidden>Log out</button>
+      <button class="cart-button" id="cart-open" aria-label="Open cart">Cart <span id="cart-count">0</span></button>
+    </nav>
+  </header>
+  <main>
+    <section class="hero" id="hero">
+      <div class="hero-copy"><p class="eyebrow">PS007 / CAREFULLY FULFILLED</p><h1>Medicine, handled with care.</h1><p class="hero-lede">A considered pharmacy experience for discovering trusted medicines and placing every order with confidence.</p><div class="hero-actions"><button class="button button-dark" data-view="catalog">Browse the catalog</button><button class="text-button" id="hero-signin">Sign in to order <span>→</span></button></div></div>
+      <div class="hero-note"><span class="seal">✓</span><div><strong>Verified fulfillment</strong><p>Inventory is checked at the moment your order is placed.</p></div></div>
+    </section>
+    <section class="content-section" id="catalog-view" data-page="catalog">
+      <div class="section-intro"><div><p class="eyebrow">THE COLLECTION</p><h2>Find what you need.</h2></div><p class="section-description">Browse our current medicine inventory, filtered by category and ready stock.</p></div>
+      <div class="catalog-tools"><label class="search-field"><span>Search medicines</span><input id="search" type="search" placeholder="Name, category, manufacturer" autocomplete="off"></label><label><span>Category</span><select id="category"><option value="">All categories</option></select></label><label><span>Sort</span><select id="sort"><option value="featured">Featured</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option><option value="stock">Most available</option></select></label></div>
+      <div id="catalog" class="product-grid" aria-live="polite"></div><p id="catalog-empty" class="empty-state" hidden>No medicines match your search.</p>
+    </section>
+    <section class="content-section" id="dashboard-view" data-page="dashboard" hidden>
+      <div class="section-intro"><div><p class="eyebrow">YOUR ACCOUNT</p><h2>Good to see you.</h2></div><p class="section-description" id="account-summary"></p></div>
+      <div class="stat-grid"><div class="stat"><span>Orders placed</span><strong id="order-count">0</strong></div><div class="stat"><span>Latest status</span><strong id="latest-status">—</strong></div><div class="stat"><span>Account role</span><strong id="account-role">CUSTOMER</strong></div></div>
+      <div class="section-heading"><h3>Order history</h3><button class="text-button" id="refresh-orders">Refresh <span>↻</span></button></div><div id="order-list" class="order-list"></div>
+    </section>
+    <section class="content-section" id="admin-view" data-page="admin" hidden>
+      <div class="section-intro"><div><p class="eyebrow">OPERATIONS</p><h2>Medicine management.</h2></div><p class="section-description">Maintain the catalog and keep stock information current.</p></div>
+      <form id="medicine-form" class="admin-form"><input type="hidden" id="edit-id"><label>Name<input id="medicine-name" required></label><label>Category<input id="medicine-category" required></label><label>Manufacturer<input id="medicine-manufacturer" required></label><label>Price<input id="medicine-price" type="number" min="0" step="0.01" required></label><label>Stock<input id="medicine-stock" type="number" min="0" required></label><label class="wide">Description<textarea id="medicine-description" rows="2"></textarea></label><label class="check-label"><input id="medicine-prescription" type="checkbox"> Prescription required</label><div class="form-actions"><button class="button button-dark" type="submit" id="medicine-save">Add medicine</button><button class="text-button" type="button" id="medicine-cancel" hidden>Cancel</button></div></form>
+      <div id="admin-medicines" class="admin-table" aria-live="polite"></div><div class="section-heading admin-orders-heading"><h3>Order monitoring</h3><button class="text-button" id="refresh-admin-orders">Refresh <span>↻</span></button></div><div id="admin-orders" class="order-list" aria-live="polite"></div>
+    </section>
+  </main>
+  <div class="modal-backdrop" id="auth-modal" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="auth-title"><button class="modal-close" data-close="auth-modal" aria-label="Close">×</button><p class="eyebrow">APOTHECARY EXPRESS</p><h2 id="auth-title">Welcome back.</h2><div class="tabs"><button class="tab active" data-auth-tab="login">Sign in</button><button class="tab" data-auth-tab="register">Create account</button></div><form id="login-form" class="modal-form"><label>Email<input id="email" type="email" required autocomplete="email"></label><label>Password<input id="password" type="password" required autocomplete="current-password"></label><button class="button button-dark" type="submit">Sign in</button></form><form id="register-form" class="modal-form" hidden><label>Name<input id="register-name" required autocomplete="name"></label><label>Email<input id="register-email" type="email" required autocomplete="email"></label><label>Password<input id="register-password" type="password" minlength="8" required autocomplete="new-password"></label><p class="form-hint">Use at least 8 characters. New accounts are created as customers.</p><button class="button button-dark" type="submit">Create account</button></form><p class="form-message" id="auth-message" role="status"></p></section></div>
+  <div class="modal-backdrop" id="detail-modal" hidden><section class="modal detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title"><button class="modal-close" data-close="detail-modal" aria-label="Close">×</button><p class="eyebrow" id="detail-category"></p><h2 id="detail-title"></h2><p id="detail-description"></p><div class="detail-meta"><span id="detail-manufacturer"></span><span id="detail-prescription"></span><strong id="detail-price"></strong></div><label class="quantity">Quantity<input id="detail-quantity" type="number" min="1" value="1"></label><button class="button button-dark" id="detail-add">Add to cart</button></section></div>
+  <aside class="cart-drawer" id="cart-drawer" aria-label="Shopping cart" aria-hidden="true"><div class="drawer-header"><div><p class="eyebrow">YOUR SELECTION</p><h2>Cart</h2></div><button class="modal-close" id="cart-close" aria-label="Close cart">×</button></div><div id="cart-items" class="cart-items"></div><div class="cart-footer"><div><span>Subtotal</span><strong id="cart-total">$0.00</strong></div><button class="button button-dark" id="checkout">Place order</button><p class="form-message" id="cart-message"></p></div></aside>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>window.API_BASE = window.API_BASE || 'http://localhost:8080';</script><script src="app.js?v=final"></script>
+</body>
+</html>

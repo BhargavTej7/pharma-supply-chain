@@ -1,0 +1,11 @@
+**/target/
+**/.mvn/wrapper/maven-wrapper.jar
+.env
+**/node_modules/
+*.tmp
+*.bak
+*.log
+.idea/
+.vscode/
+
+**/bin/
