@@ -25,7 +25,7 @@ The services communicate with Docker service names inside Compose. The frontend 
 - Order Service: customer orders, ownership checks, status management, medicine integration
 - Eureka Server: service registration and discovery
 - PostgreSQL 16: persistent users, medicines, and orders
-- Java 21, Spring Boot 4.1.1, Spring Cloud 2025.1.0, Maven, Docker Compose
+- Java 21, Spring Boot 4.1.1, Spring Cloud 2025.1.2, Maven, Docker Compose
 
 ## Ports
 
@@ -71,7 +71,7 @@ Copy-Item .env.example .env
  docker compose ps
 ```
 
-Check Eureka at `http://localhost:8761`. Check service health where Actuator is enabled at `/actuator/health`.
+Check Eureka at `http://localhost:8761`. Every backend container now exposes `/actuator/health`. Render assigns `PORT`; services bind to `${PORT:defaultPort}` and keep local defaults when `PORT` is unset. Do not copy a Render `postgres://` database URL into `DATABASE_URL`; convert it to `jdbc:postgresql://HOST:5432/DBNAME?sslmode=require`.
 
 ## API overview
 

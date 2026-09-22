@@ -14,6 +14,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD must be set}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       EUREKA_URL: ${EUREKA_URL:?EUREKA_URL must be set}
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
       BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:?BOOTSTRAP_ADMIN_EMAIL must be set}
       BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:?BOOTSTRAP_ADMIN_PASSWORD must be set}
     depends_on: [eureka-server]
@@ -28,6 +29,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?INTERNAL_SERVICE_TOKEN must be set}
       EUREKA_URL: ${EUREKA_URL:?EUREKA_URL must be set}
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
     depends_on: [eureka-server]
     networks: [pharma]
   order-service:
@@ -41,6 +43,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?INTERNAL_SERVICE_TOKEN must be set}
       EUREKA_URL: ${EUREKA_URL:?EUREKA_URL must be set}
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
     depends_on: [eureka-server, medicine-service]
     networks: [pharma]
   api-gateway:

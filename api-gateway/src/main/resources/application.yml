@@ -18,17 +18,22 @@ spring:
             - id: user-service
               uri: lb://user-service
               predicates:
-                - Path=/users/**,/test
+                - Path=/users,/users/**,/auth/**,/test
             - id: medicine-service
               uri: lb://medicine-service
               predicates:
-                - Path=/medicines/**
+                - Path=/medicines,/medicines/**
             - id: order-service
               uri: lb://order-service
               predicates:
-                - Path=/orders/**
+                - Path=/orders,/orders/**
 server:
-  port: 8080
+  port: ${PORT:8080}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
 eureka:
   client:
     service-url:
